@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const WalletSection = ({ balance, onAddMoney }) => {
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     // Load Razorpay script
@@ -18,9 +21,15 @@ const WalletSection = ({ balance, onAddMoney }) => {
 
   const handleAddMoney = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
 
     try {
+      if (parseFloat(amount) <= 0) {
+        setError('Please enter a valid amount');
+        return;
+      }
+
       const options = {
         key: 'rzp_test_XXXXXXXXXXXXX', // Replace with your test key
         amount: amount * 100, // Amount in paise
@@ -30,6 +39,8 @@ const WalletSection = ({ balance, onAddMoney }) => {
         handler: function(response) {
           onAddMoney(amount);
           setAmount('');
+          setShowSuccess(true);
+          setTimeout(() => setShowSuccess(false), 3000);
         },
         prefill: {
           name: 'User Name',
@@ -45,23 +56,40 @@ const WalletSection = ({ balance, onAddMoney }) => {
       razorpay.open();
     } catch (error) {
       console.error('Error:', error);
+      setError('Failed to process payment. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-6 rounded-xl shadow-xl text-white">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-gradient-to-br from-indigo-600 to-purple-600 p-6 rounded-xl shadow-xl text-white"
+    >
       <div className="flex justify-between items-center mb-6">
         <div>
           <h3 className="text-lg font-medium">Wallet Balance</h3>
-          <p className="text-3xl font-bold mt-2">₹{balance.toFixed(2)}</p>
+          <motion.p 
+            key={balance}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            className="text-3xl font-bold mt-2"
+          >
+            ₹{balance.toFixed(2)}
+          </motion.p>
         </div>
-        <div className="bg-white/10 p-3 rounded-full">
+        <motion.div 
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="bg-white/10 p-3 rounded-full"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
           </svg>
-        </div>
+        </motion.div>
       </div>
 
       <form onSubmit={handleAddMoney} className="space-y-4">
@@ -82,11 +110,24 @@ const WalletSection = ({ balance, onAddMoney }) => {
               className="block w-full pl-7 pr-12 py-2 border border-transparent rounded-md bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent sm:text-sm"
               placeholder="0.00"
               required
+              min="0"
+              step="0.01"
             />
           </div>
+          {error && (
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 text-sm text-red-300"
+            >
+              {error}
+            </motion.p>
+          )}
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={isLoading}
           className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
@@ -98,9 +139,22 @@ const WalletSection = ({ balance, onAddMoney }) => {
             </svg>
           ) : null}
           Add Money
-        </button>
+        </motion.button>
       </form>
-    </div>
+
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mt-4 p-3 bg-green-500/20 rounded-lg text-green-200 text-sm"
+          >
+            Money added successfully!
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
