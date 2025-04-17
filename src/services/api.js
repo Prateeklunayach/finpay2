@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://da18cb3d-90d8-4e21-b63e-19d719f06fcf-00-321o5acwph97q.sisko.replit.dev:3001/';
+const API_BASE_URL = 'https://da18cb3d-90d8-4e21-b63e-19d719f06fcf-00-321o5acwph97q.sisko.replit.dev:3001';
 
 export const registerUser = async (userData) => {
   try {
