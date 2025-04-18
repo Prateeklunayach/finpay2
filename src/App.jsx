@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import RegistrationForm from './components/RegistrationForm'
 import FingerprintRegistration from './components/FingerprintRegistration'
+import Wallet from './components/Wallet'
 
 function App() {
   const [userId, setUserId] = useState(null)
@@ -20,7 +21,7 @@ function App() {
           <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
-                User Registration System
+                FinPay
               </h1>
               
               {!userId ? (
@@ -32,11 +33,15 @@ function App() {
                   onSuccess={() => setRegistrationComplete(true)} 
                 />
               ) : (
-                <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md text-center">
-                  <h2 className="text-2xl font-bold mb-4">Registration Complete!</h2>
-                  <p className="text-gray-600">
-                    Your account has been successfully created and your fingerprint has been registered.
-                  </p>
+                <div className="space-y-8">
+                  <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md text-center">
+                    <h2 className="text-2xl font-bold mb-4">Welcome to FinPay!</h2>
+                    <p className="text-gray-600">
+                      Your account has been successfully created and your fingerprint has been registered.
+                    </p>
+                  </div>
+                  
+                  <Wallet userId={userId} />
                 </div>
               )}
             </div>
